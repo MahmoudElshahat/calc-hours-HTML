@@ -419,7 +419,7 @@
         const dayOfMonth = today.getDate();
 
         // تاريخ البداية = اليوم
-        startDateInput.value = `${yyyy}-${mm}-${dd}`;
+        startDateInput.value = `${yyyy}-${mm}-${dd} + 1`;
 
         // آخر يوم في الشهر
         const endOfMonth = new Date(yyyy, today.getMonth() + 1, 0);
