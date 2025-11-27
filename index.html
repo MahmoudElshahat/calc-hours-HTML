@@ -404,57 +404,64 @@
     }
 
     // القيم الافتراضية عند فتح الصفحة
-    window.addEventListener('DOMContentLoaded', function () {
-        const startDateInput = document.getElementById('startDate');
-        const endDateInput = document.getElementById('endDate');
-        const fixedDailyAfterEndInput = document.getElementById('fixedDailyAfterEnd');
-        const totalHoursInput = document.getElementById('totalHours');
-        const workedHoursInput = document.getElementById('workedHours');
-        const useSecondPeriodInput = document.getElementById('useSecondPeriod');
+   // القيم الافتراضية عند فتح الصفحة
+window.addEventListener('DOMContentLoaded', function () {
+    const startDateInput = document.getElementById('startDate');
+    const endDateInput = document.getElementById('endDate');
+    const fixedDailyAfterEndInput = document.getElementById('fixedDailyAfterEnd');
+    const totalHoursInput = document.getElementById('totalHours');
+    const workedHoursInput = document.getElementById('workedHours');
+    const useSecondPeriodInput = document.getElementById('useSecondPeriod');
 
-       const today = new Date();
-        today.setDate(today.getDate() + 1); // tomorrow
-        
-        let yyyy = today.getFullYear();
-        let mm = String(today.getMonth() + 1).padStart(2, '0');
-        let dd = String(today.getDate()).padStart(2, '0');
-        
-        startDateInput.value = `${yyyy}-${mm}-${dd}`;
+    // اليوم الفعلي
+    const today = new Date();
 
-        // آخر يوم في الشهر
-        const endOfMonth = new Date(yyyy, today.getMonth() + 1, 0);
-        const eomDay = String(endOfMonth.getDate()).padStart(2, '0');
+    // ✨ جعل تاريخ البداية = غدًا دائمًا
+    const baseDate = new Date(today);
+    baseDate.setDate(baseDate.getDate() + 1); // tomorrow
 
-        // منطق تاريخ النهاية الافتراضي
-        let endDateStr;
-        if (dayOfMonth > 12) {
-            endDateStr = `${yyyy}-${mm}-${eomDay}`;
-        } else if (dayOfMonth < 10) {
-            endDateStr = `${yyyy}-${mm}-10`;
-        } else {
-            endDateStr = `${yyyy}-${mm}-${dd}`;
-        }
-        endDateInput.value = endDateStr;
+    const yyyy = baseDate.getFullYear();
+    const mm = String(baseDate.getMonth() + 1).padStart(2, '0');
+    const dd = String(baseDate.getDate()).padStart(2, '0');
+    const dayOfMonth = baseDate.getDate();
 
-        // إجمالي الساعات الشهرية الافتراضي = 160
-        totalHoursInput.value = '160';
+    // تاريخ البداية = غدًا
+    startDateInput.value = `${yyyy}-${mm}-${dd}`;
 
-        // الساعات المنجزة الافتراضي = 0
-        workedHoursInput.value = '0';
+    // آخر يوم في الشهر (حسب شهر تاريخ البداية = غدًا)
+    const endOfMonth = new Date(yyyy, baseDate.getMonth() + 1, 0);
+    const eomDay = String(endOfMonth.getDate()).padStart(2, '0');
 
-        // عدد الساعات اليومية في الفترة الثانية الافتراضي: 6 ساعات
-        fixedDailyAfterEndInput.value = '6';
+    // منطق تاريخ النهاية الافتراضي (مبني على يوم الغد)
+    let endDateStr;
+    if (dayOfMonth > 12) {
+        endDateStr = `${yyyy}-${mm}-${eomDay}`;
+    } else if (dayOfMonth < 10) {
+        endDateStr = `${yyyy}-${mm}-10`;
+    } else {
+        endDateStr = `${yyyy}-${mm}-${dd}`;
+    }
+    endDateInput.value = endDateStr;
 
-        // تفعيل الفترة الثانية افتراضيًا: قبل أو يوم 10 فقط
-        if (dayOfMonth > 10) {
-            useSecondPeriodInput.checked = false;
-        } else {
-            useSecondPeriodInput.checked = true;
-        }
-        updateSecondPeriodVisibility();
+    // إجمالي الساعات الشهرية الافتراضي = 160
+    totalHoursInput.value = '160';
 
-        useSecondPeriodInput.addEventListener('change', updateSecondPeriodVisibility);
-    });
+    // الساعات المنجزة الافتراضي = 0
+    workedHoursInput.value = '0';
+
+    // عدد الساعات اليومية في الفترة الثانية الافتراضي: 6 ساعات
+    fixedDailyAfterEndInput.value = '6';
+
+    // تفعيل الفترة الثانية افتراضيًا: قبل أو يوم 10 (بحسب يوم الغد)
+    if (dayOfMonth > 10) {
+        useSecondPeriodInput.checked = false;
+    } else {
+        useSecondPeriodInput.checked = true;
+    }
+    updateSecondPeriodVisibility();
+
+    useSecondPeriodInput.addEventListener('change', updateSecondPeriodVisibility);
+});
 
     function calculateHours() {
         const totalHoursInput = document.getElementById('totalHours');
