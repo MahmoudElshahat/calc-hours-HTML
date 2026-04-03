@@ -193,6 +193,7 @@
     tr.off-day td { color: #9ca3af; font-style: italic; }
     td.hours-cell { font-weight: 600; }
 
+    /* ====== Month calendar ordered by weekday (columns) ====== */
     .calendar-wrap {
       margin-top: 12px;
       border: 1px solid var(--border);
@@ -229,6 +230,7 @@
       font-size: 12px;
     }
 
+    /* UPDATED day card */
     .day-card {
       border: 1px solid var(--border);
       border-radius: 12px;
@@ -242,18 +244,16 @@
       user-select: none;
       transition: transform 0.06s ease, box-shadow 0.06s ease, background 0.06s ease;
     }
-
     .day-card:hover {
       background: #f3f4f6;
       box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
     }
-
     .day-card:active { transform: translateY(1px); }
 
     .day-date {
       font-weight: 800;
       color: #111827;
-      font-size: 12px;
+      font-size: 12px; /* smaller */
       line-height: 1.2;
     }
 
@@ -262,12 +262,12 @@
       align-items:center;
       gap: 6px;
       margin-top: 2px;
-      font-size: 11px;
+      font-size: 11px; /* smaller */
       color: var(--text-muted);
     }
 
     .day-controls input[type="checkbox"]{
-      transform: scale(0.92);
+      transform: scale(0.92); /* smaller */
       margin: 0;
     }
 
@@ -305,9 +305,9 @@
       <div class="col">
         <label>
           إجمالي عدد الساعات المطلوبة في الشهر:
-          <input type="number" id="totalHours" min="0" step="0.1" placeholder="مثال: 146" />
+          <input type="number" id="totalHours" min="0" step="0.1" placeholder="مثال: 160" />
         </label>
-        <div class="hint">الافتراضي: 146 ساعة في الشهر.</div>
+        <div class="hint">الافتراضي: 160 ساعة في الشهر.</div>
       </div>
       <div class="col">
         <label>
@@ -401,19 +401,14 @@
   function decimalToHoursMinutes(decimal) {
     let hours = Math.floor(decimal);
     let minutes = Math.round((decimal - hours) * 60);
-
-    if (minutes === 60) {
-      hours += 1;
-      minutes = 0;
-    }
-
+    if (minutes === 60) { hours += 1; minutes = 0; }
     return { hours, minutes };
   }
 
   function formatHoursMinutes(decimal) {
     const { hours, minutes } = decimalToHoursMinutes(decimal);
-    const timeFormat = `${hours}:${String(minutes).padStart(2, '0')}`;
-    return { hours, minutes, timeFormat };
+    const dotFormat = hours + '.' + String(minutes).padStart(2, '0');
+    return { hours, minutes, dotFormat };
   }
 
   function getDayNameArabic(dayIndex) {
@@ -521,6 +516,7 @@
     return count;
   }
 
+  // Calendar: columns per weekday, checkbox on new line, click card toggles checkbox
   function rebuildCalendarForMonth(year, monthIndex) {
     const grid = document.getElementById('calendarGrid');
     const meta = document.getElementById('calendarMeta');
@@ -542,6 +538,7 @@
       { idx: 6, name: 'السبت' },
     ];
 
+    // Headers
     weekDays.forEach(d => {
       const header = document.createElement('div');
       header.className = 'weekday-header';
@@ -549,6 +546,7 @@
       grid.appendChild(header);
     });
 
+    // Collect dates by weekday
     const datesByDay = new Map();
     weekDays.forEach(d => datesByDay.set(d.idx, []));
 
@@ -603,6 +601,7 @@
         controls.appendChild(cb);
         controls.appendChild(label);
 
+        // Click card toggles checkbox (but ignore direct checkbox click)
         card.addEventListener('click', (e) => {
           if (e.target && e.target.tagName === 'INPUT') return;
           cb.checked = !cb.checked;
@@ -652,7 +651,7 @@
 
     planEndDateInput.value = `${yyyy}-${mm}-${eomDD}`;
 
-    totalHoursInput.value = '146';
+    totalHoursInput.value = '160';
     workedHoursInput.value = '0';
     fixedDailyAfterEndInput.value = '6';
 
@@ -823,11 +822,11 @@
       <div>أيام العمل في الفترة الثانية: <strong>${workingDays2}</strong> يوم</div>
 
       <div>الساعات اليومية في الفترة الأولى:</div>
-      <div class="daily-hours">- ${fmt1.timeFormat}</div>
+      <div class="daily-hours">- ${fmt1.hours} ساعة و ${fmt1.minutes} دقيقة (${fmt1.dotFormat})</div>
 
       ${useSecondPeriod ? `
         <div>الساعات اليومية في الفترة الثانية:</div>
-        <div class="daily-hours">- ${fmt2.timeFormat}</div>
+        <div class="daily-hours">- ${fmt2.hours} ساعة و ${fmt2.minutes} دقيقة (${fmt2.dotFormat})</div>
       ` : `<div>الفترة الثانية غير مفعّلة.</div>`}
     `;
 
@@ -868,7 +867,7 @@
         hoursCell = 'إجازة';
       } else {
         const fmtDay = formatHoursMinutes(hoursDecimal);
-        hoursCell = fmtDay.timeFormat;
+        hoursCell = `${fmtDay.hours} ساعة و ${fmtDay.minutes} دقيقة (${fmtDay.dotFormat})`;
       }
 
       tableHtml += `
@@ -891,3 +890,6 @@
 </script>
 </body>
 </html>
+
+update this logic to calc based on إجمالي عدد الساعات المطلوبة في الشهر:
+and count all days from date of tommorw based on days not check as day of 
