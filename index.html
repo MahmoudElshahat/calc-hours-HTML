@@ -2,7 +2,6 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>حاسبة الساعات اليومية</title>
   <style>
     :root {
@@ -13,17 +12,9 @@
       --border: #e5e7eb;
       --text-main: #111827;
       --text-muted: #6b7280;
-      --success-bg: #ecfdf5;
-      --success-border: #d1fae5;
-      --success-text: #065f46;
-      --danger-text: #b91c1c;
-      --danger-soft: #fff7ed;
-      --danger-border: #fecaca;
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -64,19 +55,14 @@
       align-items: center;
       justify-content: center;
       font-size: 22px;
-      flex-shrink: 0;
     }
 
-    h2 {
-      margin: 0;
-      font-size: 20px;
-    }
+    h2 { margin: 0; font-size: 20px; }
 
     .subtitle {
       font-size: 13px;
       color: var(--text-muted);
-      margin-top: 4px;
-      line-height: 1.8;
+      margin-bottom: 20px;
     }
 
     label {
@@ -86,12 +72,9 @@
       color: var(--text-main);
     }
 
-    .blue-value {
-      color: var(--primary);
-      font-weight: 700;
-    }
+    .blue-value { color: #2563eb; font-weight: 700; }
 
-    input[type="number"] {
+    input[type="number"], input[type="date"] {
       margin-top: 6px;
       width: 100%;
       padding: 10px 12px;
@@ -103,7 +86,7 @@
       background-color: #f9fafb;
     }
 
-    input[type="number"]:focus {
+    input[type="number"]:focus, input[type="date"]:focus {
       border-color: var(--primary);
       background-color: #ffffff;
       box-shadow: 0 0 0 1px var(--primary-soft);
@@ -117,11 +100,7 @@
       background-color: #f9fafb;
     }
 
-    legend {
-      padding: 0 6px;
-      font-size: 13px;
-      color: var(--text-muted);
-    }
+    legend { padding: 0 6px; font-size: 13px; color: var(--text-muted); }
 
     fieldset label {
       margin-top: 4px;
@@ -136,20 +115,13 @@
       cursor: pointer;
     }
 
-    .row {
-      display: flex;
-      gap: 16px;
-      flex-wrap: wrap;
-    }
-
-    .col {
-      flex: 1 1 260px;
-    }
+    .row { display: flex; gap: 16px; flex-wrap: wrap; }
+    .col { flex: 1 1 260px; }
 
     button {
       margin-top: 18px;
       width: 100%;
-      padding: 12px 0;
+      padding: 10px 0;
       border-radius: 999px;
       border: none;
       background: linear-gradient(135deg, #2563eb, #1d4ed8);
@@ -171,26 +143,19 @@
       box-shadow: 0 8px 18px rgba(37, 99, 235, 0.3);
     }
 
-    .hint {
-      font-size: 12px;
-      color: var(--text-muted);
-      margin-top: 4px;
-      line-height: 1.7;
-    }
+    .hint { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
 
     .result {
       margin-top: 20px;
       padding: 16px 14px;
       border-radius: 14px;
-      border: 1px solid var(--success-border);
-      background: var(--success-bg);
+      border: 1px solid #d1fae5;
+      background: #ecfdf5;
       font-size: 16px;
       line-height: 1.9;
     }
 
-    .result strong {
-      color: var(--success-text);
-    }
+    .result strong { color: #065f46; }
 
     .result-title {
       display: flex;
@@ -198,7 +163,6 @@
       gap: 8px;
       margin-bottom: 10px;
       font-weight: 600;
-      flex-wrap: wrap;
     }
 
     .badge {
@@ -211,11 +175,7 @@
       margin-right: 4px;
     }
 
-    .daily-hours {
-      color: #dc2626;
-      font-weight: 700;
-      font-size: 20px;
-    }
+    .daily-hours { color: #dc2626; font-weight: 700; }
 
     .table-wrapper {
       margin-top: 20px;
@@ -226,38 +186,15 @@
       overflow-x: auto;
     }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13px;
-    }
-
-    th, td {
-      padding: 8px;
-      border-bottom: 1px solid #e5e7eb;
-      text-align: right;
-    }
-
-    th {
-      background: #f9fafb;
-      font-weight: 600;
-    }
-
-    tr:nth-child(even) {
-      background: #f9fafb;
-    }
-
-    tr.off-day td {
-      color: #9ca3af;
-      font-style: italic;
-    }
-
-    td.hours-cell {
-      font-weight: 600;
-    }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { padding: 6px 8px; border-bottom: 1px solid #e5e7eb; text-align: right; }
+    th { background: #f9fafb; font-weight: 600; }
+    tr:nth-child(even) { background: #f9fafb; }
+    tr.off-day td { color: #9ca3af; font-style: italic; }
+    td.hours-cell { font-weight: 600; }
 
     .calendar-wrap {
-      margin-top: 16px;
+      margin-top: 12px;
       border: 1px solid var(--border);
       background: #fff;
       border-radius: 14px;
@@ -265,15 +202,14 @@
     }
 
     .calendar-title {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
       margin-bottom: 10px;
       color: var(--text-main);
       font-weight: 700;
       font-size: 14px;
-      flex-wrap: wrap;
     }
 
     .calendar-grid {
@@ -296,10 +232,10 @@
     .day-card {
       border: 1px solid var(--border);
       border-radius: 12px;
-      padding: 8px;
+      padding: 8px 8px;
       background: #f9fafb;
-      display: flex;
-      flex-direction: column;
+      display:flex;
+      flex-direction:column;
       gap: 6px;
       min-height: 64px;
       cursor: pointer;
@@ -312,9 +248,7 @@
       box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
     }
 
-    .day-card:active {
-      transform: translateY(1px);
-    }
+    .day-card:active { transform: translateY(1px); }
 
     .day-date {
       font-weight: 800;
@@ -324,514 +258,636 @@
     }
 
     .day-controls {
-      display: flex;
-      align-items: center;
+      display:flex;
+      align-items:center;
       gap: 6px;
       margin-top: 2px;
       font-size: 11px;
       color: var(--text-muted);
     }
 
-    .day-controls input[type="checkbox"] {
+    .day-controls input[type="checkbox"]{
       transform: scale(0.92);
       margin: 0;
     }
 
     .day-off {
-      outline: 2px solid var(--danger-border);
-      background: var(--danger-soft);
+      outline: 2px solid #fecaca;
+      background: #fff7ed;
     }
-
-    .day-off .day-date,
-    .day-off .day-controls {
-      color: var(--danger-text);
-    }
+    .day-off .day-date { color:#b91c1c; }
+    .day-off .day-controls { color:#b91c1c; }
 
     @media (max-width: 900px) {
-      .calendar-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
+      .calendar-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
-
     @media (max-width: 480px) {
-      .calendar-grid {
-        grid-template-columns: repeat(1, minmax(0, 1fr));
-      }
-
-      .weekday-header {
-        font-size: 13px;
-      }
-
-      .day-date {
-        font-size: 13px;
-      }
-
-      .day-controls {
-        font-size: 12px;
-      }
+      .calendar-grid { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+      .weekday-header { font-size: 13px; }
+      .day-date { font-size: 13px; }
+      .day-controls { font-size: 12px; }
     }
   </style>
 </head>
+
 <body>
-  <div class="container">
-    <div class="card">
-      <div class="card-header">
-        <div class="icon-circle">⏱️</div>
-        <div>
-          <h2>حاسبة توزيع الساعات حتى نهاية الشهر</h2>
-          <div class="subtitle">
-            يتم حساب الساعات اليومية بناءً على إجمالي عدد الساعات المطلوبة في الشهر،
-            بدايةً من الغد وحتى نهاية الشهر، مع استبعاد الأيام المحددة كإجازة.
+<div class="container">
+  <div class="card">
+    <div class="card-header">
+      <div class="icon-circle">⏱️</div>
+      <div>
+        <h2>حاسبة توزيع الساعات حتى نهاية الشهر (فترتين)</h2>
+        <div class="subtitle">إجمالي الهدف الشهري + الساعات المنجزة + فترتين عمل + اختيار الإجازات من تقويم مرتب حسب أيام الأسبوع.</div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col">
+        <label>
+          إجمالي عدد الساعات المطلوبة في الشهر:
+          <input type="number" id="totalHours" min="0" step="0.1" placeholder="مثال: 146" />
+        </label>
+        <div class="hint">الافتراضي: 146 ساعة في الشهر.</div>
+      </div>
+      <div class="col">
+        <label>
+          عدد الساعات التي تم إنجازها حتى الآن:
+          <input type="number" id="workedHours" min="0" step="0.1" placeholder="مثال: 85" />
+        </label>
+        <div class="hint">سيتم طرح هذه الساعات من الإجمالي لحساب المتبقي.</div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col">
+        <label>
+          تاريخ البداية (الفترة الأولى):
+          <input type="date" id="startDate" />
+        </label>
+        <div class="hint">الافتراضي: غدًا.</div>
+      </div>
+
+      <div class="col">
+        <label>
+          تاريخ النهاية (الفترة الأولى):
+          <input type="date" id="endDate" />
+        </label>
+        <div class="hint">حدد نهاية الفترة الأولى.</div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col">
+        <label>
+          تاريخ نهاية الخطة داخل الشهر:
+          <input type="date" id="planEndDate" />
+        </label>
+        <div class="hint">الافتراضي: آخر يوم في نفس شهر تاريخ البداية.</div>
+      </div>
+    </div>
+
+    <fieldset>
+      <legend>إجازات ثابتة (تُطبّق على كل التواريخ في نفس اليوم داخل الشهر)</legend>
+      <label>
+        <input type="checkbox" id="offSaturdayGlobal" checked>
+        السبت إجازة (علّم كل سبت)
+      </label>
+      <label>
+        <input type="checkbox" id="offSundayGlobal">
+        الأحد إجازة (علّم كل أحد)
+      </label>
+      <div class="hint">تقدر تغيّر أي يوم يدويًا من التقويم حتى لو السبت/الأحد مفعّل.</div>
+    </fieldset>
+
+    <div class="calendar-wrap">
+      <div class="calendar-title">
+        <div>📅 تقويم الشهر (اضغط على الكارت لتحديد/إلغاء الإجازة)</div>
+        <div class="hint" id="calendarMeta" style="margin:0;"></div>
+      </div>
+      <div id="calendarGrid" class="calendar-grid"></div>
+    </div>
+
+    <fieldset>
+      <legend>إعدادات الفترة الثانية</legend>
+      <label style="margin-bottom: 6px;">
+        <input type="checkbox" id="useSecondPeriod">
+        تفعيل الفترة الثانية (من بعد تاريخ النهاية حتى تاريخ نهاية الخطة بعدد ساعات ثابت)
+      </label>
+
+      <div id="secondPeriodContainer">
+        <div class="row">
+          <div class="col">
+            <label>
+              عدد الساعات اليومية في الفترة الثانية:
+              <input type="number" id="fixedDailyAfterEnd" min="0" step="0.1" />
+            </label>
+            <div class="hint">الافتراضي: 6 ساعات في اليوم.</div>
           </div>
         </div>
       </div>
+    </fieldset>
 
-      <div class="row">
-        <div class="col">
-          <label>
-            إجمالي عدد الساعات المطلوبة في الشهر:
-            <input type="number" id="totalHours" min="0" step="0.1" placeholder="مثال: 146" />
-          </label>
-          <div class="hint">القيمة الافتراضية: 146 ساعة.</div>
-        </div>
-      </div>
+    <button onclick="calculateHours()">احسب توزيع الساعات وجدول الأيام</button>
 
-      <fieldset>
-        <legend>إجازات ثابتة داخل الشهر</legend>
-
-        <label>
-          <input type="checkbox" id="offSaturdayGlobal" checked />
-          السبت إجازة
-        </label>
-
-        <label>
-          <input type="checkbox" id="offSundayGlobal" />
-          الأحد إجازة
-        </label>
-
-        <div class="hint">
-          يمكنك أيضًا تحديد أو إلغاء أي يوم يدويًا من التقويم.
-        </div>
-      </fieldset>
-
-      <div class="calendar-wrap">
-        <div class="calendar-title">
-          <div>📅 تقويم الشهر (اضغط على الكارت لتحديد/إلغاء الإجازة)</div>
-          <div class="hint" id="calendarMeta" style="margin: 0;"></div>
-        </div>
-
-        <div id="calendarGrid" class="calendar-grid"></div>
-      </div>
-
-      <button type="button" id="calculateBtn">احسب توزيع الساعات</button>
-
-      <div id="result" class="result" style="display: none;"></div>
-      <div id="planTable" class="table-wrapper" style="display: none;"></div>
-    </div>
+    <div id="result" class="result" style="display:none;"></div>
+    <div id="planTable" class="table-wrapper" style="display:none;"></div>
   </div>
+</div>
 
-  <script>
-    const offDates = new Set();
-    let currentCalendarMonthKey = "";
+<script>
+  const offDates = new Set();
+  let currentCalendarMonthKey = "";
 
-    function decimalToHoursMinutes(decimal) {
-      let hours = Math.floor(decimal);
-      let minutes = Math.round((decimal - hours) * 60);
+  function decimalToHoursMinutes(decimal) {
+    let hours = Math.floor(decimal);
+    let minutes = Math.round((decimal - hours) * 60);
 
-      if (minutes === 60) {
-        hours += 1;
-        minutes = 0;
-      }
-
-      return { hours, minutes };
+    if (minutes === 60) {
+      hours += 1;
+      minutes = 0;
     }
 
-    function formatHoursMinutes(decimal) {
-      const { hours, minutes } = decimalToHoursMinutes(decimal);
-      const timeFormat = `${hours}:${String(minutes).padStart(2, "0")}`;
-      return { hours, minutes, timeFormat };
+    return { hours, minutes };
+  }
+
+  function formatHoursMinutes(decimal) {
+    const { hours, minutes } = decimalToHoursMinutes(decimal);
+    const timeFormat = `${hours}:${String(minutes).padStart(2, '0')}`;
+    return { hours, minutes, timeFormat };
+  }
+
+  function getDayNameArabic(dayIndex) {
+    const names = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+    return names[dayIndex] || '';
+  }
+
+  function formatDateLocal(d) {
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  }
+
+  function parseDateInputToLocalDate(value) {
+    const [y, m, d] = value.split('-').map(Number);
+    return new Date(y, m - 1, d);
+  }
+
+  function endOfMonthFromDate(d) {
+    return new Date(d.getFullYear(), d.getMonth() + 1, 0);
+  }
+
+  function updateSecondPeriodVisibility() {
+    const useSecondPeriod = document.getElementById('useSecondPeriod').checked;
+    document.getElementById('secondPeriodContainer').style.display = useSecondPeriod ? 'block' : 'none';
+  }
+
+  function refreshDayCardStyle(cardEl, dateStr) {
+    if (offDates.has(dateStr)) cardEl.classList.add('day-off');
+    else cardEl.classList.remove('day-off');
+  }
+
+  function syncCalendarCheckboxesFromSet() {
+    document.querySelectorAll('#calendarGrid input[type="checkbox"][data-date]').forEach(cb => {
+      const ds = cb.dataset.date;
+      cb.checked = offDates.has(ds);
+      const card = cb.closest('.day-card');
+      if (card) refreshDayCardStyle(card, ds);
+    });
+  }
+
+  function applyWeekendRulesToCalendar() {
+    const startDateValue = document.getElementById('startDate').value;
+    if (!startDateValue) return;
+
+    const start = parseDateInputToLocalDate(startDateValue);
+    const year = start.getFullYear();
+    const monthIndex = start.getMonth();
+
+    const satOn = document.getElementById('offSaturdayGlobal').checked;
+    const sunOn = document.getElementById('offSundayGlobal').checked;
+
+    const last = new Date(year, monthIndex + 1, 0);
+
+    for (let day = 1; day <= last.getDate(); day++) {
+      const date = new Date(year, monthIndex, day);
+      const dateStr = formatDateLocal(date);
+      const dow = date.getDay();
+      if (dow === 6 && satOn) offDates.add(dateStr);
+      if (dow === 0 && sunOn) offDates.add(dateStr);
     }
 
-    function getDayNameArabic(dayIndex) {
-      const names = ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
-      return names[dayIndex] || "";
+    syncCalendarCheckboxesFromSet();
+  }
+
+  function refreshWeekendCheckboxStates() {
+    const startDateValue = document.getElementById('startDate').value;
+    if (!startDateValue) return;
+
+    const start = parseDateInputToLocalDate(startDateValue);
+    const year = start.getFullYear();
+    const monthIndex = start.getMonth();
+    const last = new Date(year, monthIndex + 1, 0);
+
+    const saturdays = [];
+    const sundays = [];
+
+    for (let day = 1; day <= last.getDate(); day++) {
+      const date = new Date(year, monthIndex, day);
+      const ds = formatDateLocal(date);
+      const dow = date.getDay();
+      if (dow === 6) saturdays.push(ds);
+      if (dow === 0) sundays.push(ds);
     }
 
-    function formatDateLocal(date) {
-      const yyyy = date.getFullYear();
-      const mm = String(date.getMonth() + 1).padStart(2, "0");
-      const dd = String(date.getDate()).padStart(2, "0");
-      return `${yyyy}-${mm}-${dd}`;
+    const satCb = document.getElementById('offSaturdayGlobal');
+    const sunCb = document.getElementById('offSundayGlobal');
+
+    const satSelectedCount = saturdays.filter(d => offDates.has(d)).length;
+    const sunSelectedCount = sundays.filter(d => offDates.has(d)).length;
+
+    satCb.indeterminate = satSelectedCount > 0 && satSelectedCount < saturdays.length;
+    sunCb.indeterminate = sunSelectedCount > 0 && sunSelectedCount < sundays.length;
+  }
+
+  function countWorkingDaysBySelection(fromDate, toDate) {
+    let d = new Date(fromDate.getTime());
+    let count = 0;
+    while (d <= toDate) {
+      const ds = formatDateLocal(d);
+      if (!offDates.has(ds)) count++;
+      d.setDate(d.getDate() + 1);
+    }
+    return count;
+  }
+
+  function rebuildCalendarForMonth(year, monthIndex) {
+    const grid = document.getElementById('calendarGrid');
+    const meta = document.getElementById('calendarMeta');
+    grid.innerHTML = "";
+
+    const last = new Date(year, monthIndex + 1, 0);
+    const monthKey = `${year}-${String(monthIndex + 1).padStart(2,'0')}`;
+    currentCalendarMonthKey = monthKey;
+
+    meta.textContent = `الشهر: ${monthKey} | الأيام: ${last.getDate()} | اضغط على الكارت للتحديد`;
+
+    const weekDays = [
+      { idx: 0, name: 'الأحد' },
+      { idx: 1, name: 'الاثنين' },
+      { idx: 2, name: 'الثلاثاء' },
+      { idx: 3, name: 'الأربعاء' },
+      { idx: 4, name: 'الخميس' },
+      { idx: 5, name: 'الجمعة' },
+      { idx: 6, name: 'السبت' },
+    ];
+
+    weekDays.forEach(d => {
+      const header = document.createElement('div');
+      header.className = 'weekday-header';
+      header.textContent = d.name;
+      grid.appendChild(header);
+    });
+
+    const datesByDay = new Map();
+    weekDays.forEach(d => datesByDay.set(d.idx, []));
+
+    for (let day = 1; day <= last.getDate(); day++) {
+      const date = new Date(year, monthIndex, day);
+      const dateStr = formatDateLocal(date);
+      datesByDay.get(date.getDay()).push({ dateStr });
     }
 
-    function endOfMonthFromDate(date) {
-      return new Date(date.getFullYear(), date.getMonth() + 1, 0);
-    }
+    const maxRows = Math.max(...weekDays.map(d => datesByDay.get(d.idx).length));
 
-    function getTomorrow() {
-      const today = new Date();
-      return new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
-    }
+    for (let r = 0; r < maxRows; r++) {
+      weekDays.forEach(d => {
+        const item = datesByDay.get(d.idx)[r];
 
-    function refreshDayCardStyle(cardEl, dateStr) {
-      if (offDates.has(dateStr)) {
-        cardEl.classList.add("day-off");
-      } else {
-        cardEl.classList.remove("day-off");
-      }
-    }
-
-    function syncCalendarCheckboxesFromSet() {
-      document.querySelectorAll('#calendarGrid input[type="checkbox"][data-date]').forEach((checkbox) => {
-        const dateStr = checkbox.dataset.date;
-        checkbox.checked = offDates.has(dateStr);
-
-        const card = checkbox.closest(".day-card");
-        if (card) {
-          refreshDayCardStyle(card, dateStr);
+        if (!item) {
+          const empty = document.createElement('div');
+          empty.className = 'day-card';
+          empty.style.visibility = 'hidden';
+          grid.appendChild(empty);
+          return;
         }
-      });
-    }
 
-    function applyWeekendRulesToCalendar() {
-      const tomorrow = getTomorrow();
-      const year = tomorrow.getFullYear();
-      const monthIndex = tomorrow.getMonth();
-      const lastDay = new Date(year, monthIndex + 1, 0);
+        const { dateStr } = item;
 
-      const saturdayEnabled = document.getElementById("offSaturdayGlobal").checked;
-      const sundayEnabled = document.getElementById("offSundayGlobal").checked;
+        const card = document.createElement('div');
+        card.className = 'day-card';
 
-      for (let day = 1; day <= lastDay.getDate(); day++) {
-        const currentDate = new Date(year, monthIndex, day);
-        const dateStr = formatDateLocal(currentDate);
-        const dayOfWeek = currentDate.getDay();
+        const dateEl = document.createElement('div');
+        dateEl.className = 'day-date';
+        dateEl.textContent = dateStr;
 
-        if (dayOfWeek === 6 && saturdayEnabled) {
-          offDates.add(dateStr);
-        }
+        const controls = document.createElement('div');
+        controls.className = 'day-controls';
 
-        if (dayOfWeek === 0 && sundayEnabled) {
-          offDates.add(dateStr);
-        }
-      }
+        const cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.dataset.date = dateStr;
+        cb.checked = offDates.has(dateStr);
 
-      syncCalendarCheckboxesFromSet();
-    }
-
-    function refreshWeekendCheckboxStates() {
-      const tomorrow = getTomorrow();
-      const year = tomorrow.getFullYear();
-      const monthIndex = tomorrow.getMonth();
-      const lastDay = new Date(year, monthIndex + 1, 0);
-
-      const saturdays = [];
-      const sundays = [];
-
-      for (let day = 1; day <= lastDay.getDate(); day++) {
-        const currentDate = new Date(year, monthIndex, day);
-        const dateStr = formatDateLocal(currentDate);
-        const dayOfWeek = currentDate.getDay();
-
-        if (dayOfWeek === 6) saturdays.push(dateStr);
-        if (dayOfWeek === 0) sundays.push(dateStr);
-      }
-
-      const saturdayCheckbox = document.getElementById("offSaturdayGlobal");
-      const sundayCheckbox = document.getElementById("offSundayGlobal");
-
-      const selectedSaturdays = saturdays.filter((dateStr) => offDates.has(dateStr)).length;
-      const selectedSundays = sundays.filter((dateStr) => offDates.has(dateStr)).length;
-
-      saturdayCheckbox.indeterminate =
-        selectedSaturdays > 0 && selectedSaturdays < saturdays.length;
-
-      sundayCheckbox.indeterminate =
-        selectedSundays > 0 && selectedSundays < sundays.length;
-    }
-
-    function countWorkingDaysBySelection(fromDate, toDate) {
-      let currentDate = new Date(fromDate.getTime());
-      let count = 0;
-
-      while (currentDate <= toDate) {
-        const dateStr = formatDateLocal(currentDate);
-
-        if (!offDates.has(dateStr)) {
-          count++;
-        }
-
-        currentDate.setDate(currentDate.getDate() + 1);
-      }
-
-      return count;
-    }
-
-    function rebuildCalendarForMonth(year, monthIndex) {
-      const grid = document.getElementById("calendarGrid");
-      const meta = document.getElementById("calendarMeta");
-      grid.innerHTML = "";
-
-      const lastDay = new Date(year, monthIndex + 1, 0);
-      const monthKey = `${year}-${String(monthIndex + 1).padStart(2, "0")}`;
-      currentCalendarMonthKey = monthKey;
-
-      meta.textContent = `الشهر: ${monthKey} | الأيام: ${lastDay.getDate()} | اضغط على الكارت للتحديد`;
-
-      const weekDays = [
-        { idx: 0, name: "الأحد" },
-        { idx: 1, name: "الاثنين" },
-        { idx: 2, name: "الثلاثاء" },
-        { idx: 3, name: "الأربعاء" },
-        { idx: 4, name: "الخميس" },
-        { idx: 5, name: "الجمعة" },
-        { idx: 6, name: "السبت" }
-      ];
-
-      weekDays.forEach((day) => {
-        const header = document.createElement("div");
-        header.className = "weekday-header";
-        header.textContent = day.name;
-        grid.appendChild(header);
-      });
-
-      const datesByDay = new Map();
-      weekDays.forEach((day) => datesByDay.set(day.idx, []));
-
-      for (let day = 1; day <= lastDay.getDate(); day++) {
-        const date = new Date(year, monthIndex, day);
-        const dateStr = formatDateLocal(date);
-        datesByDay.get(date.getDay()).push({ dateStr });
-      }
-
-      const maxRows = Math.max(...weekDays.map((day) => datesByDay.get(day.idx).length));
-
-      for (let rowIndex = 0; rowIndex < maxRows; rowIndex++) {
-        weekDays.forEach((day) => {
-          const item = datesByDay.get(day.idx)[rowIndex];
-
-          if (!item) {
-            const empty = document.createElement("div");
-            empty.className = "day-card";
-            empty.style.visibility = "hidden";
-            grid.appendChild(empty);
-            return;
-          }
-
-          const { dateStr } = item;
-
-          const card = document.createElement("div");
-          card.className = "day-card";
-
-          const dateEl = document.createElement("div");
-          dateEl.className = "day-date";
-          dateEl.textContent = dateStr;
-
-          const controls = document.createElement("div");
-          controls.className = "day-controls";
-
-          const checkbox = document.createElement("input");
-          checkbox.type = "checkbox";
-          checkbox.dataset.date = dateStr;
-          checkbox.checked = offDates.has(dateStr);
-
-          checkbox.addEventListener("change", (event) => {
-            const selectedDate = event.target.dataset.date;
-
-            if (event.target.checked) {
-              offDates.add(selectedDate);
-            } else {
-              offDates.delete(selectedDate);
-            }
-
-            refreshDayCardStyle(card, selectedDate);
-            refreshWeekendCheckboxStates();
-          });
-
-          const label = document.createElement("span");
-          label.textContent = "إجازة";
-
-          controls.appendChild(checkbox);
-          controls.appendChild(label);
-
-          card.addEventListener("click", (event) => {
-            if (event.target && event.target.tagName === "INPUT") {
-              return;
-            }
-
-            checkbox.checked = !checkbox.checked;
-            checkbox.dispatchEvent(new Event("change", { bubbles: true }));
-          });
-
-          card.appendChild(dateEl);
-          card.appendChild(controls);
-
-          grid.appendChild(card);
-          refreshDayCardStyle(card, dateStr);
+        cb.addEventListener('change', (e) => {
+          const ds = e.target.dataset.date;
+          if (e.target.checked) offDates.add(ds);
+          else offDates.delete(ds);
+          refreshDayCardStyle(card, ds);
+          refreshWeekendCheckboxStates();
         });
-      }
 
-      applyWeekendRulesToCalendar();
-      refreshWeekendCheckboxStates();
+        const label = document.createElement('span');
+        label.textContent = 'إجازة';
+
+        controls.appendChild(cb);
+        controls.appendChild(label);
+
+        card.addEventListener('click', (e) => {
+          if (e.target && e.target.tagName === 'INPUT') return;
+          cb.checked = !cb.checked;
+          cb.dispatchEvent(new Event('change', { bubbles: true }));
+        });
+
+        card.appendChild(dateEl);
+        card.appendChild(controls);
+
+        grid.appendChild(card);
+        refreshDayCardStyle(card, dateStr);
+      });
     }
 
-    function initializeCalendar() {
-      const tomorrow = getTomorrow();
-      rebuildCalendarForMonth(tomorrow.getFullYear(), tomorrow.getMonth());
-    }
+    applyWeekendRulesToCalendar();
+    refreshWeekendCheckboxStates();
+  }
 
-    function updateWeekendDates(dayIndex, isChecked) {
-      const tomorrow = getTomorrow();
-      const year = tomorrow.getFullYear();
-      const monthIndex = tomorrow.getMonth();
-      const lastDay = new Date(year, monthIndex + 1, 0);
+  window.addEventListener('DOMContentLoaded', function () {
+    const startDateInput = document.getElementById('startDate');
+    const endDateInput = document.getElementById('endDate');
+    const planEndDateInput = document.getElementById('planEndDate');
+    const fixedDailyAfterEndInput = document.getElementById('fixedDailyAfterEnd');
+    const totalHoursInput = document.getElementById('totalHours');
+    const workedHoursInput = document.getElementById('workedHours');
+    const useSecondPeriodInput = document.getElementById('useSecondPeriod');
 
-      for (let day = 1; day <= lastDay.getDate(); day++) {
-        const currentDate = new Date(year, monthIndex, day);
+    const today = new Date();
+    const baseDate = new Date(today);
+    baseDate.setDate(baseDate.getDate() + 1);
 
-        if (currentDate.getDay() === dayIndex) {
-          const dateStr = formatDateLocal(currentDate);
+    const yyyy = baseDate.getFullYear();
+    const mm = String(baseDate.getMonth() + 1).padStart(2, '0');
+    const dd = String(baseDate.getDate()).padStart(2, '0');
+    const dayOfMonth = baseDate.getDate();
 
-          if (isChecked) {
-            offDates.add(dateStr);
-          } else {
-            offDates.delete(dateStr);
-          }
+    startDateInput.value = `${yyyy}-${mm}-${dd}`;
+
+    const eom = endOfMonthFromDate(baseDate);
+    const eomDD = String(eom.getDate()).padStart(2, '0');
+
+    let endDateStr;
+    if (dayOfMonth > 12) endDateStr = `${yyyy}-${mm}-${eomDD}`;
+    else if (dayOfMonth < 10) endDateStr = `${yyyy}-${mm}-10`;
+    else endDateStr = `${yyyy}-${mm}-${dd}`;
+    endDateInput.value = endDateStr;
+
+    planEndDateInput.value = `${yyyy}-${mm}-${eomDD}`;
+
+    totalHoursInput.value = '146';
+    workedHoursInput.value = '0';
+    fixedDailyAfterEndInput.value = '6';
+
+    useSecondPeriodInput.checked = dayOfMonth <= 10;
+    updateSecondPeriodVisibility();
+    useSecondPeriodInput.addEventListener('change', updateSecondPeriodVisibility);
+
+    const start = parseDateInputToLocalDate(startDateInput.value);
+    rebuildCalendarForMonth(start.getFullYear(), start.getMonth());
+
+    startDateInput.addEventListener('change', () => {
+      const start2 = parseDateInputToLocalDate(startDateInput.value);
+      const eom2 = endOfMonthFromDate(start2);
+      planEndDateInput.value = formatDateLocal(eom2);
+
+      offDates.clear();
+      rebuildCalendarForMonth(start2.getFullYear(), start2.getMonth());
+    });
+
+    document.getElementById('offSaturdayGlobal').addEventListener('change', (e) => {
+      const start3 = parseDateInputToLocalDate(startDateInput.value);
+      const last = new Date(start3.getFullYear(), start3.getMonth() + 1, 0);
+
+      for (let day = 1; day <= last.getDate(); day++) {
+        const date = new Date(start3.getFullYear(), start3.getMonth(), day);
+        if (date.getDay() === 6) {
+          const ds = formatDateLocal(date);
+          if (e.target.checked) offDates.add(ds);
+          else offDates.delete(ds);
         }
       }
-
       syncCalendarCheckboxesFromSet();
       refreshWeekendCheckboxStates();
+    });
+
+    document.getElementById('offSundayGlobal').addEventListener('change', (e) => {
+      const start3 = parseDateInputToLocalDate(startDateInput.value);
+      const last = new Date(start3.getFullYear(), start3.getMonth() + 1, 0);
+
+      for (let day = 1; day <= last.getDate(); day++) {
+        const date = new Date(start3.getFullYear(), start3.getMonth(), day);
+        if (date.getDay() === 0) {
+          const ds = formatDateLocal(date);
+          if (e.target.checked) offDates.add(ds);
+          else offDates.delete(ds);
+        }
+      }
+      syncCalendarCheckboxesFromSet();
+      refreshWeekendCheckboxStates();
+    });
+  });
+
+  function calculateHours() {
+    const monthlyTarget = parseFloat(document.getElementById('totalHours').value);
+    let workedHours = parseFloat(document.getElementById('workedHours').value);
+    if (isNaN(workedHours) || workedHours < 0) workedHours = 0;
+
+    if (isNaN(monthlyTarget) || monthlyTarget <= 0) {
+      alert('من فضلك أدخل إجمالي عدد الساعات الشهرية (رقم أكبر من صفر).');
+      return;
     }
 
-    function calculateHours() {
-      const totalHoursInput = document.getElementById("totalHours");
-      const monthlyTarget = parseFloat(totalHoursInput.value);
+    const totalHoursRemaining = Math.max(0, monthlyTarget - workedHours);
 
-      if (isNaN(monthlyTarget) || monthlyTarget <= 0) {
-        alert("من فضلك أدخل إجمالي عدد الساعات المطلوبة في الشهر.");
-        totalHoursInput.focus();
-        return;
-      }
+    const startDateValue = document.getElementById('startDate').value;
+    const endDateValue = document.getElementById('endDate').value;
+    const planEndDateValue = document.getElementById('planEndDate').value;
 
-      const start = getTomorrow();
-      const planEnd = endOfMonthFromDate(start);
+    const useSecondPeriod = document.getElementById('useSecondPeriod').checked;
+    const fixedDailyAfterEnd = parseFloat(document.getElementById('fixedDailyAfterEnd').value);
 
-      const expectedMonthKey = `${start.getFullYear()}-${String(start.getMonth() + 1).padStart(2, "0")}`;
+    if (!startDateValue || !endDateValue || !planEndDateValue) {
+      alert('من فضلك اختر تاريخ البداية وتاريخ النهاية وتاريخ نهاية الخطة.');
+      return;
+    }
+    if (isNaN(fixedDailyAfterEnd) || fixedDailyAfterEnd < 0) {
+      alert('من فضلك أدخل عدد الساعات اليومية في الفترة الثانية (يمكن أن يكون صفر أو أكثر).');
+      return;
+    }
 
-      if (currentCalendarMonthKey !== expectedMonthKey) {
-        offDates.clear();
-        rebuildCalendarForMonth(start.getFullYear(), start.getMonth());
-      }
+    const start = parseDateInputToLocalDate(startDateValue);
+    let mid = parseDateInputToLocalDate(endDateValue);
+    const planEnd = parseDateInputToLocalDate(planEndDateValue);
 
-      const workingDays = countWorkingDaysBySelection(start, planEnd);
+    if (mid < start) {
+      alert('تاريخ النهاية يجب أن يكون بعد أو يساوي تاريخ البداية.');
+      return;
+    }
+    if (planEnd < start) {
+      alert('تاريخ نهاية الخطة يجب أن يكون بعد أو يساوي تاريخ البداية.');
+      return;
+    }
+    if (
+      start.getFullYear() !== mid.getFullYear() || start.getMonth() !== mid.getMonth() ||
+      start.getFullYear() !== planEnd.getFullYear() || start.getMonth() !== planEnd.getMonth()
+    ) {
+      alert('يفضل أن تكون تواريخ البداية/النهاية/نهاية الخطة في نفس الشهر.');
+      return;
+    }
 
-      if (workingDays <= 0) {
-        alert("لا يوجد أيام عمل متاحة من الغد حتى نهاية الشهر بعد استبعاد الإجازات.");
-        return;
-      }
+    if (!useSecondPeriod) {
+      mid = new Date(planEnd.getTime());
+    } else {
+      if (mid > planEnd) mid = new Date(planEnd.getTime());
+    }
 
-      const hoursPerDayDecimal = monthlyTarget / workingDays;
-      const formattedDaily = formatHoursMinutes(hoursPerDayDecimal);
+    const workingDays1 = countWorkingDaysBySelection(start, mid);
 
-      const startStr = formatDateLocal(start);
-      const planEndStr = formatDateLocal(planEnd);
+    let workingDays2 = 0;
+    let secondPeriodStart = null;
+    if (useSecondPeriod && mid < planEnd) {
+      secondPeriodStart = new Date(mid.getTime());
+      secondPeriodStart.setDate(secondPeriodStart.getDate() + 1);
+      workingDays2 = countWorkingDaysBySelection(secondPeriodStart, planEnd);
+    }
 
-      const resultDiv = document.getElementById("result");
-      resultDiv.style.display = "block";
-      resultDiv.innerHTML = `
-        <div class="result-title">
-          <span>📊 الملخص:</span>
-          <span class="badge">توزيع الساعات</span>
-        </div>
+    const totalHoursSecondPeriod = useSecondPeriod ? fixedDailyAfterEnd * workingDays2 : 0;
 
-        <div>
-          إجمالي عدد الساعات المطلوبة:
-          <span class="blue-value">${monthlyTarget.toFixed(2)}</span> ساعة
-        </div>
+    const remainingForFirst = totalHoursRemaining - totalHoursSecondPeriod;
+    if (remainingForFirst < 0) {
+      alert('ساعات الفترة الثانية أكبر من الساعات المتبقية.\nقلل ساعات الفترة الثانية أو زوّد الهدف الشهري أو عدّل الساعات المنجزة.');
+      return;
+    }
 
-        <div>
-          فترة الحساب:
-          <strong>${startStr}</strong> → <strong>${planEndStr}</strong>
-        </div>
+    const totalHoursFirstPeriod = workingDays1 > 0 ? remainingForFirst : 0;
+    const hoursPerDay1Decimal = workingDays1 > 0 ? (remainingForFirst / workingDays1) : 0;
 
-        <div>
-          عدد أيام العمل المتاحة بعد استبعاد الإجازات:
-          <strong>${workingDays}</strong> يوم
-        </div>
+    const fmt1 = formatHoursMinutes(hoursPerDay1Decimal);
+    const fmt2 = formatHoursMinutes(fixedDailyAfterEnd);
 
-        <div>إجمالي ساعات العمل اليومية:</div>
-        <div class="daily-hours">${formattedDaily.timeFormat}</div>
-      `;
+    const startStr = formatDateLocal(start);
+    const midStr = formatDateLocal(mid);
+    const planEndStr = formatDateLocal(planEnd);
 
-      const planTableDiv = document.getElementById("planTable");
+    const resultDiv = document.getElementById('result');
+    resultDiv.style.display = 'block';
+    resultDiv.innerHTML = `
+      <div class="result-title">
+        <span>📊 الملخص:</span>
+        <span class="badge">توزيع الساعات</span>
+      </div>
 
-      let tableHtml = `
-        <table>
-          <thead>
-            <tr>
-              <th>التاريخ</th>
-              <th>اليوم</th>
-              <th>الحالة</th>
-              <th>ساعات العمل</th>
-            </tr>
-          </thead>
-          <tbody>
-      `;
+      <div>إجمالي الساعات المطلوبة:
+        <span class="blue-value">${monthlyTarget.toFixed(2)}</span> ساعة
+      </div>
 
-      let currentDate = new Date(start.getTime());
+      <div>إجمالي الساعات المنجزة:
+        <span class="blue-value">${workedHours.toFixed(2)}</span> ساعة
+      </div>
 
-      while (currentDate <= planEnd) {
-        const dateStr = formatDateLocal(currentDate);
-        const dayName = getDayNameArabic(currentDate.getDay());
-        const isOff = offDates.has(dateStr);
+      <div>إجمالي الساعات المتبقية:
+        <span class="blue-value">${totalHoursRemaining.toFixed(2)}</span> ساعة
+      </div>
 
-        let rowClass = "";
-        let statusText = "يوم عمل";
-        let hoursCell = formattedDaily.timeFormat;
+      <div>نهاية الخطة:
+        <strong>${planEndStr}</strong>
+      </div>
 
-        if (isOff) {
-          rowClass = "off-day";
-          statusText = "إجازة";
-          hoursCell = "إجازة";
-        }
+      <div>إجمالي ساعات الفترة الأولى (${startStr} → ${midStr}):
+        <strong>${totalHoursFirstPeriod.toFixed(2)}</strong> ساعة
+      </div>
 
-        tableHtml += `
-          <tr class="${rowClass}">
-            <td>${dateStr}</td>
-            <td>${dayName}</td>
-            <td>${statusText}</td>
-            <td class="hours-cell">${hoursCell}</td>
+      <div>إجمالي ساعات الفترة الثانية (${midStr} → ${planEndStr}):
+        <strong>${totalHoursSecondPeriod.toFixed(2)}</strong> ساعة
+      </div>
+
+      <div>أيام العمل في الفترة الأولى: <strong>${workingDays1}</strong> يوم</div>
+      <div>أيام العمل في الفترة الثانية: <strong>${workingDays2}</strong> يوم</div>
+
+      <div>الساعات اليومية في الفترة الأولى:</div>
+      <div class="daily-hours">- ${fmt1.timeFormat}</div>
+
+      ${useSecondPeriod ? `
+        <div>الساعات اليومية في الفترة الثانية:</div>
+        <div class="daily-hours">- ${fmt2.timeFormat}</div>
+      ` : `<div>الفترة الثانية غير مفعّلة.</div>`}
+    `;
+
+    const planTableDiv = document.getElementById('planTable');
+
+    let tableHtml = `
+      <table>
+        <thead>
+          <tr>
+            <th>التاريخ</th>
+            <th>اليوم</th>
+            <th>الفترة</th>
+            <th>ساعات العمل</th>
           </tr>
-        `;
+        </thead>
+        <tbody>
+    `;
 
-        currentDate.setDate(currentDate.getDate() + 1);
+    let current = new Date(start.getTime());
+    while (current <= planEnd) {
+      const ds = formatDateLocal(current);
+      const dayName = getDayNameArabic(current.getDay());
+
+      const isOff = offDates.has(ds);
+      const periodLabel = (current <= mid) ? 'الفترة الأولى' : 'الفترة الثانية';
+
+      let hoursDecimal = 0;
+      if (!isOff) {
+        if (current <= mid) hoursDecimal = hoursPerDay1Decimal;
+        else hoursDecimal = useSecondPeriod ? fixedDailyAfterEnd : 0;
+      }
+
+      let rowClass = '';
+      let hoursCell = '0';
+
+      if (isOff || (!useSecondPeriod && current > mid)) {
+        rowClass = 'off-day';
+        hoursCell = 'إجازة';
+      } else {
+        const fmtDay = formatHoursMinutes(hoursDecimal);
+        hoursCell = fmtDay.timeFormat;
       }
 
       tableHtml += `
-          </tbody>
-        </table>
+        <tr class="${rowClass}">
+          <td>${ds}</td>
+          <td>${dayName}</td>
+          <td>${periodLabel}</td>
+          <td class="hours-cell">${hoursCell}</td>
+        </tr>
       `;
 
-      planTableDiv.style.display = "block";
-      planTableDiv.innerHTML = tableHtml;
+      current.setDate(current.getDate() + 1);
     }
 
-    window.addEventListener("DOMContentLoaded", function () {
-      document.getElementById("totalHours").value = "146";
+    tableHtml += `</tbody></table>`;
 
-      initializeCalendar();
-
-      document.getElementById("offSaturdayGlobal").addEventListener("change", function (event) {
-        updateWeekendDates(6, event.target.checked);
-      });
-
-      document.getElementById("offSundayGlobal").addEventListener("change", function (event) {
-        updateWeekendDates(0, event.target.checked);
-      });
-
-      document.getElementById("calculateBtn").addEventListener("click", calculateHours);
-    });
-  </script>
+    planTableDiv.style.display = 'block';
+    planTableDiv.innerHTML = tableHtml;
+  }
+</script>
 </body>
 </html>
