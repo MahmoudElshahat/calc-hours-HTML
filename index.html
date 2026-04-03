@@ -338,12 +338,20 @@
       background: #fff7ed;
     }
 
-    .day-off .day-date {
+    .day-off .day-date,
+    .day-off .day-controls {
       color: #b91c1c;
     }
 
-    .day-off .day-controls {
-      color: #b91c1c;
+    .debug-box {
+      margin-top: 12px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      font-size: 12px;
+      line-height: 1.8;
+      color: #1e3a8a;
     }
 
     @media (max-width: 900px) {
@@ -478,6 +486,7 @@
       <button type="button" id="calculateBtn">احسب توزيع الساعات وجدول الأيام</button>
 
       <div id="result" class="result" style="display: none;"></div>
+      <div id="debugBox" class="debug-box" style="display: none;"></div>
       <div id="planTable" class="table-wrapper" style="display: none;"></div>
     </div>
   </div>
@@ -487,20 +496,18 @@
     let currentCalendarMonthKey = "";
 
     function decimalToHoursMinutes(decimal) {
-      let hours = Math.floor(decimal);
-      let minutes = Math.floor((decimal - hours) * 60);
-
-      if (minutes < 0) {
-        minutes = 0;
-      }
-
+      const hours = Math.floor(decimal);
+      const minutes = Math.floor((decimal - hours) * 60);
       return { hours, minutes };
     }
 
     function formatHoursMinutes(decimal) {
       const { hours, minutes } = decimalToHoursMinutes(decimal);
-      const timeFormat = `${hours}:${String(minutes).padStart(2, "0")}`;
-      return { hours, minutes, timeFormat };
+      return {
+        hours,
+        minutes,
+        timeFormat: `${hours}:${String(minutes).padStart(2, "0")}`
+      };
     }
 
     function getDayNameArabic(dayIndex) {
@@ -555,10 +562,8 @@
       const start = parseDateInputToLocalDate(startDateValue);
       const year = start.getFullYear();
       const monthIndex = start.getMonth();
-
       const satOn = document.getElementById("offSaturdayGlobal").checked;
       const sunOn = document.getElementById("offSundayGlobal").checked;
-
       const last = new Date(year, monthIndex + 1, 0);
 
       for (let day = 1; day <= last.getDate(); day++) {
@@ -605,15 +610,17 @@
     }
 
     function countWorkingDaysBySelection(fromDate, toDate) {
-      let d = new Date(fromDate.getTime());
+      const current = new Date(fromDate.getFullYear(), fromDate.getMonth(), fromDate.getDate());
+      const end = new Date(toDate.getFullYear(), toDate.getMonth(), toDate.getDate());
+
       let count = 0;
 
-      while (d <= toDate) {
-        const ds = formatDateLocal(d);
+      while (current.getTime() <= end.getTime()) {
+        const ds = formatDateLocal(current);
         if (!offDates.has(ds)) {
-          count++;
+          count += 1;
         }
-        d.setDate(d.getDate() + 1);
+        current.setDate(current.getDate() + 1);
       }
 
       return count;
@@ -689,12 +696,8 @@
 
           cb.addEventListener("change", (e) => {
             const ds = e.target.dataset.date;
-
-            if (e.target.checked) {
-              offDates.add(ds);
-            } else {
-              offDates.delete(ds);
-            }
+            if (e.target.checked) offDates.add(ds);
+            else offDates.delete(ds);
 
             refreshDayCardStyle(card, ds);
             refreshWeekendCheckboxStates();
@@ -774,7 +777,6 @@
       const startDateValue = document.getElementById("startDate").value;
       const endDateValue = document.getElementById("endDate").value;
       const planEndDateValue = document.getElementById("planEndDate").value;
-
       const useSecondPeriod = document.getElementById("useSecondPeriod").checked;
       const fixedDailyAfterEnd = parseFloat(document.getElementById("fixedDailyAfterEnd").value);
 
@@ -811,11 +813,9 @@
       }
 
       if (!useSecondPeriod) {
-        mid = new Date(planEnd.getTime());
-      } else {
-        if (mid > planEnd) {
-          mid = new Date(planEnd.getTime());
-        }
+        mid = new Date(planEnd.getFullYear(), planEnd.getMonth(), planEnd.getDate());
+      } else if (mid > planEnd) {
+        mid = new Date(planEnd.getFullYear(), planEnd.getMonth(), planEnd.getDate());
       }
 
       const workingDays1 = countWorkingDaysBySelection(start, mid);
@@ -823,9 +823,8 @@
       let workingDays2 = 0;
       let secondPeriodStart = null;
 
-      if (useSecondPeriod && mid < planEnd) {
-        secondPeriodStart = new Date(mid.getTime());
-        secondPeriodStart.setDate(secondPeriodStart.getDate() + 1);
+      if (useSecondPeriod && mid.getTime() < planEnd.getTime()) {
+        secondPeriodStart = new Date(mid.getFullYear(), mid.getMonth(), mid.getDate() + 1);
         workingDays2 = countWorkingDaysBySelection(secondPeriodStart, planEnd);
       }
 
@@ -833,7 +832,7 @@
       const remainingForFirst = totalHoursRemaining - totalHoursSecondPeriod;
 
       if (remainingForFirst < 0) {
-        alert("ساعات الفترة الثانية أكبر من الساعات المتبقية.\nقلل ساعات الفترة الثانية أو زوّد الهدف الشهري أو عدّل الساعات المنجزة.");
+        alert("ساعات الفترة الثانية أكبر من الساعات المتبقية.");
         return;
       }
 
@@ -855,33 +854,27 @@
           <span class="badge">توزيع الساعات</span>
         </div>
 
-        <div>
-          إجمالي الساعات المطلوبة:
+        <div>إجمالي الساعات المطلوبة:
           <span class="blue-value">${monthlyTarget.toFixed(2)}</span> ساعة
         </div>
 
-        <div>
-          إجمالي الساعات المنجزة:
+        <div>إجمالي الساعات المنجزة:
           <span class="blue-value">${workedHours.toFixed(2)}</span> ساعة
         </div>
 
-        <div>
-          إجمالي الساعات المتبقية:
+        <div>إجمالي الساعات المتبقية:
           <span class="blue-value">${totalHoursRemaining.toFixed(2)}</span> ساعة
         </div>
 
-        <div>
-          نهاية الخطة:
+        <div>نهاية الخطة:
           <strong>${planEndStr}</strong>
         </div>
 
-        <div>
-          إجمالي ساعات الفترة الأولى (${startStr} → ${midStr}):
+        <div>إجمالي ساعات الفترة الأولى (${startStr} → ${midStr}):
           <strong>${totalHoursFirstPeriod.toFixed(2)}</strong> ساعة
         </div>
 
-        <div>
-          إجمالي ساعات الفترة الثانية (${midStr} → ${planEndStr}):
+        <div>إجمالي ساعات الفترة الثانية (${midStr} → ${planEndStr}):
           <strong>${totalHoursSecondPeriod.toFixed(2)}</strong> ساعة
         </div>
 
@@ -897,8 +890,20 @@
         ` : `<div>الفترة الثانية غير مفعّلة.</div>`}
       `;
 
-      const planTableDiv = document.getElementById("planTable");
+      const debugBox = document.getElementById("debugBox");
+      debugBox.style.display = "block";
+      debugBox.innerHTML = `
+        <strong>Debug:</strong><br>
+        start = ${startStr}<br>
+        mid = ${midStr}<br>
+        planEnd = ${planEndStr}<br>
+        useSecondPeriod = ${useSecondPeriod ? "true" : "false"}<br>
+        offDates = ${Array.from(offDates).sort().join(", ") || "none"}<br>
+        workingDays1 = ${workingDays1}<br>
+        workingDays2 = ${workingDays2}
+      `;
 
+      const planTableDiv = document.getElementById("planTable");
       let tableHtml = `
         <table>
           <thead>
@@ -912,19 +917,18 @@
           <tbody>
       `;
 
-      let current = new Date(start.getTime());
+      let current = new Date(start.getFullYear(), start.getMonth(), start.getDate());
 
-      while (current <= planEnd) {
+      while (current.getTime() <= planEnd.getTime()) {
         const ds = formatDateLocal(current);
         const dayName = getDayNameArabic(current.getDay());
-
         const isOff = offDates.has(ds);
-        const periodLabel = current <= mid ? "الفترة الأولى" : "الفترة الثانية";
+        const periodLabel = current.getTime() <= mid.getTime() ? "الفترة الأولى" : "الفترة الثانية";
 
         let hoursDecimal = 0;
 
         if (!isOff) {
-          if (current <= mid) {
+          if (current.getTime() <= mid.getTime()) {
             hoursDecimal = hoursPerDay1Decimal;
           } else {
             hoursDecimal = useSecondPeriod ? fixedDailyAfterEnd : 0;
@@ -934,7 +938,7 @@
         let rowClass = "";
         let hoursCell = "0:00";
 
-        if (isOff || (!useSecondPeriod && current > mid)) {
+        if (isOff || (!useSecondPeriod && current.getTime() > mid.getTime())) {
           rowClass = "off-day";
           hoursCell = "إجازة";
         } else {
@@ -954,11 +958,7 @@
         current.setDate(current.getDate() + 1);
       }
 
-      tableHtml += `
-          </tbody>
-        </table>
-      `;
-
+      tableHtml += `</tbody></table>`;
       planTableDiv.style.display = "block";
       planTableDiv.innerHTML = tableHtml;
     }
@@ -1002,11 +1002,8 @@
           const date = new Date(start3.getFullYear(), start3.getMonth(), day);
           if (date.getDay() === 6) {
             const ds = formatDateLocal(date);
-            if (e.target.checked) {
-              offDates.add(ds);
-            } else {
-              offDates.delete(ds);
-            }
+            if (e.target.checked) offDates.add(ds);
+            else offDates.delete(ds);
           }
         }
 
@@ -1022,11 +1019,8 @@
           const date = new Date(start3.getFullYear(), start3.getMonth(), day);
           if (date.getDay() === 0) {
             const ds = formatDateLocal(date);
-            if (e.target.checked) {
-              offDates.add(ds);
-            } else {
-              offDates.delete(ds);
-            }
+            if (e.target.checked) offDates.add(ds);
+            else offDates.delete(ds);
           }
         }
 
