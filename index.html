@@ -447,11 +447,16 @@
         </label>
 
         <label>
+          <input type="checkbox" id="offFridayGlobal" />
+          الجمعة إجازة (علّم كل جمعة)
+        </label>
+
+        <label>
           <input type="checkbox" id="offSundayGlobal" />
           الأحد إجازة (علّم كل أحد)
         </label>
 
-        <div class="hint">تقدر تغيّر أي يوم يدويًا من التقويم حتى لو السبت/الأحد مفعّل.</div>
+        <div class="hint">تقدر تغيّر أي يوم يدويًا من التقويم حتى لو الخيارات أعلاه مفعلة.</div>
       </fieldset>
 
       <div class="calendar-wrap">
@@ -497,7 +502,7 @@
 
     function decimalToHoursMinutes(decimal) {
       const hours = Math.floor(decimal);
-      const minutes = Math.floor((decimal - hours) * 60);
+      const minutes = Math.round((decimal - hours) * 60);
       return { hours, minutes };
     }
 
@@ -563,15 +568,19 @@
       const year = start.getFullYear();
       const monthIndex = start.getMonth();
       const satOn = document.getElementById("offSaturdayGlobal").checked;
+      const friOn = document.getElementById("offFridayGlobal").checked;
       const sunOn = document.getElementById("offSundayGlobal").checked;
       const last = new Date(year, monthIndex + 1, 0);
 
+      // We clear and re-populate based on globals only when this is explicitly needed
+      // To keep it simple, we'll assume rebuildCalendarForMonth manages this.
       for (let day = 1; day <= last.getDate(); day++) {
         const date = new Date(year, monthIndex, day);
         const dateStr = formatDateLocal(date);
         const dow = date.getDay();
 
         if (dow === 6 && satOn) offDates.add(dateStr);
+        if (dow === 5 && friOn) offDates.add(dateStr);
         if (dow === 0 && sunOn) offDates.add(dateStr);
       }
 
@@ -589,6 +598,7 @@
 
       const saturdays = [];
       const sundays = [];
+      const fridays = [];
 
       for (let day = 1; day <= last.getDate(); day++) {
         const date = new Date(year, monthIndex, day);
@@ -597,6 +607,7 @@
 
         if (dow === 6) saturdays.push(ds);
         if (dow === 0) sundays.push(ds);
+        if (dow === 5) fridays.push(ds);
       }
 
       const satCb = document.getElementById("offSaturdayGlobal");
@@ -604,26 +615,38 @@
 
       const satSelectedCount = saturdays.filter((d) => offDates.has(d)).length;
       const sunSelectedCount = sundays.filter((d) => offDates.has(d)).length;
+      const friSelectedCount = fridays.filter((d) => offDates.has(d)).length;
 
       satCb.indeterminate = satSelectedCount > 0 && satSelectedCount < saturdays.length;
       sunCb.indeterminate = sunSelectedCount > 0 && sunSelectedCount < sundays.length;
+      document.getElementById("offFridayGlobal").indeterminate = friSelectedCount > 0 && friSelectedCount < fridays.length;
     }
 
     function countWorkingDaysBySelection(fromDate, toDate) {
+      // Use string comparison for robustness
+      const startStr = formatDateLocal(fromDate);
+      const endStr = formatDateLocal(toDate);
+      
       const current = new Date(fromDate.getFullYear(), fromDate.getMonth(), fromDate.getDate());
-      const end = new Date(toDate.getFullYear(), toDate.getMonth(), toDate.getDate());
-
       let count = 0;
+      const daysFound = [];
 
-      while (current.getTime() <= end.getTime()) {
+      // Loop until we pass the end date string
+      while (true) {
         const ds = formatDateLocal(current);
         if (!offDates.has(ds)) {
           count += 1;
+          daysFound.push(ds);
         }
+        
+        if (ds === endStr) break; // Reached the end date
         current.setDate(current.getDate() + 1);
+        
+        // Safety break to prevent infinite loops (max 31 days range)
+        if (daysFound.length + Array.from(offDates).length > 40) break;
       }
 
-      return count;
+      return { count, daysFound };
     }
 
     function rebuildCalendarForMonth(year, monthIndex) {
@@ -734,29 +757,19 @@
 
       const today = new Date();
       const baseDate = new Date(today);
-      baseDate.setDate(baseDate.getDate() + 1);
-
       const yyyy = baseDate.getFullYear();
       const mm = String(baseDate.getMonth() + 1).padStart(2, "0");
       const dd = String(baseDate.getDate()).padStart(2, "0");
-      const dayOfMonth = baseDate.getDate();
 
       startDateInput.value = `${yyyy}-${mm}-${dd}`;
 
       const eom = endOfMonthFromDate(baseDate);
       const eomDD = String(eom.getDate()).padStart(2, "0");
+      const eomStr = `${yyyy}-${mm}-${eomDD}`;
 
-      let endDateStr;
-      if (dayOfMonth > 12) {
-        endDateStr = `${yyyy}-${mm}-${eomDD}`;
-      } else if (dayOfMonth < 10) {
-        endDateStr = `${yyyy}-${mm}-10`;
-      } else {
-        endDateStr = `${yyyy}-${mm}-${dd}`;
-      }
-
-      endDateInput.value = endDateStr;
-      planEndDateInput.value = `${yyyy}-${mm}-${eomDD}`;
+      // Set both endDate and planEndDate to End of Month by default
+      endDateInput.value = eomStr;
+      planEndDateInput.value = eomStr;
     }
 
     function calculateHours() {
@@ -818,14 +831,19 @@
         mid = new Date(planEnd.getFullYear(), planEnd.getMonth(), planEnd.getDate());
       }
 
-      const workingDays1 = countWorkingDaysBySelection(start, mid);
+      const res1 = countWorkingDaysBySelection(start, mid);
+      const workingDays1 = res1.count;
+      const daysFound1 = res1.daysFound;
 
       let workingDays2 = 0;
+      let daysFound2 = [];
       let secondPeriodStart = null;
 
-      if (useSecondPeriod && mid.getTime() < planEnd.getTime()) {
+      if (useSecondPeriod && midStr < planEndStr) {
         secondPeriodStart = new Date(mid.getFullYear(), mid.getMonth(), mid.getDate() + 1);
-        workingDays2 = countWorkingDaysBySelection(secondPeriodStart, planEnd);
+        const res2 = countWorkingDaysBySelection(secondPeriodStart, planEnd);
+        workingDays2 = res2.count;
+        daysFound2 = res2.daysFound;
       }
 
       const totalHoursSecondPeriod = useSecondPeriod ? fixedDailyAfterEnd * workingDays2 : 0;
@@ -846,49 +864,58 @@
       const midStr = formatDateLocal(mid);
       const planEndStr = formatDateLocal(planEnd);
 
+      const workedOffDays = Array.from(offDates).filter(d => {
+        const ds = d;
+        return ds >= startStr && ds <= planEndStr;
+      }).length;
+
+      const totalDaysInPeriod = countDaysBetween(start, planEnd);
+
       const resultDiv = document.getElementById("result");
       resultDiv.style.display = "block";
       resultDiv.innerHTML = `
         <div class="result-title">
-          <span>📊 الملخص:</span>
-          <span class="badge">توزيع الساعات</span>
+          <span>📊 الملخص النهائي:</span>
+          <span class="badge">نتائج الحساب</span>
         </div>
 
-        <div>إجمالي الساعات المطلوبة:
-          <span class="blue-value">${monthlyTarget.toFixed(2)}</span> ساعة
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+          <div style="background: #fff; padding: 10px; border-radius: 10px; border: 1px solid #d1fae5;">
+            <div style="font-size: 12px; color: var(--text-muted);">إجمالي المتبقي:</div>
+            <div class="blue-value" style="font-size: 20px;">${totalHoursRemaining.toFixed(2)} <span style="font-size: 12px; font-weight: normal;">ساعة</span></div>
+          </div>
+          <div style="background: #fff; padding: 10px; border-radius: 10px; border: 1px solid #d1fae5;">
+            <div style="font-size: 12px; color: var(--text-muted);">أيام العمل الفعلية:</div>
+            <div class="blue-value" style="font-size: 20px;">${workingDays1 + workingDays2} <span style="font-size: 12px; font-weight: normal;">يوم</span></div>
+          </div>
         </div>
 
-        <div>إجمالي الساعات المنجزة:
-          <span class="blue-value">${workedHours.toFixed(2)}</span> ساعة
+        <div style="margin-bottom: 10px;">
+          <strong>الساعات المطلوبة يومياً (الفترة الحالية):</strong>
+          <div class="daily-hours" style="font-size: 28px; margin-top: 5px;">${fmt1.timeFormat}</div>
+          <div class="hint">تعادل تقريباً ${hoursPerDay1Decimal.toFixed(2)} ساعة</div>
         </div>
 
-        <div>إجمالي الساعات المتبقية:
-          <span class="blue-value">${totalHoursRemaining.toFixed(2)}</span> ساعة
+        <hr style="border: 0; border-top: 1px solid #d1fae5; margin: 15px 0;">
+
+        <div style="font-size: 13px;">
+          <div>• إجمالي الهدف: <strong>${monthlyTarget.toFixed(2)}</strong></div>
+          <div>• تم إنجاز: <strong>${workedHours.toFixed(2)}</strong></div>
+          <div>• إجمالي الأيام من (${startStr}) إلى (${planEndStr}): <strong>${totalDaysInPeriod}</strong> يوم</div>
+          <div>• أيام الإجازة بينهما: <strong>${workedOffDays}</strong> يوم</div>
+          <div style="color: #2563eb; font-weight: bold; margin-top: 5px;">• صافي أيام العمل المتبقية: ${workingDays1 + workingDays2} يوم</div>
         </div>
-
-        <div>نهاية الخطة:
-          <strong>${planEndStr}</strong>
-        </div>
-
-        <div>إجمالي ساعات الفترة الأولى (${startStr} → ${midStr}):
-          <strong>${totalHoursFirstPeriod.toFixed(2)}</strong> ساعة
-        </div>
-
-        <div>إجمالي ساعات الفترة الثانية (${midStr} → ${planEndStr}):
-          <strong>${totalHoursSecondPeriod.toFixed(2)}</strong> ساعة
-        </div>
-
-        <div>أيام العمل في الفترة الأولى: <strong>${workingDays1}</strong> يوم</div>
-        <div>أيام العمل في الفترة الثانية: <strong>${workingDays2}</strong> يوم</div>
-
-        <div>الساعات اليومية في الفترة الأولى:</div>
-        <div class="daily-hours">- ${fmt1.timeFormat}</div>
-
-        ${useSecondPeriod ? `
-          <div>الساعات اليومية في الفترة الثانية:</div>
-          <div class="daily-hours">- ${fmt2.timeFormat}</div>
-        ` : `<div>الفترة الثانية غير مفعّلة.</div>`}
       `;
+
+      function countDaysBetween(s, e) {
+        const temp = new Date(s.getFullYear(), s.getMonth(), s.getDate());
+        let c = 0;
+        while (temp <= e) {
+          c++;
+          temp.setDate(temp.getDate() + 1);
+        }
+        return c;
+      }
 
       const debugBox = document.getElementById("debugBox");
       debugBox.style.display = "block";
@@ -1018,6 +1045,23 @@
         for (let day = 1; day <= last.getDate(); day++) {
           const date = new Date(start3.getFullYear(), start3.getMonth(), day);
           if (date.getDay() === 0) {
+            const ds = formatDateLocal(date);
+            if (e.target.checked) offDates.add(ds);
+            else offDates.delete(ds);
+          }
+        }
+
+        syncCalendarCheckboxesFromSet();
+        refreshWeekendCheckboxStates();
+      });
+
+      document.getElementById("offFridayGlobal").addEventListener("change", (e) => {
+        const start3 = parseDateInputToLocalDate(startDateInput.value);
+        const last = new Date(start3.getFullYear(), start3.getMonth() + 1, 0);
+
+        for (let day = 1; day <= last.getDate(); day++) {
+          const date = new Date(start3.getFullYear(), start3.getMonth(), day);
+          if (date.getDay() === 5) {
             const ds = formatDateLocal(date);
             if (e.target.checked) offDates.add(ds);
             else offDates.delete(ds);
