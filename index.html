@@ -751,26 +751,30 @@
     }
 
     function initializeDefaultDates() {
-      const startDateInput = document.getElementById("startDate");
-      const endDateInput = document.getElementById("endDate");
-      const planEndDateInput = document.getElementById("planEndDate");
+  const startDateInput = document.getElementById("startDate");
+  const endDateInput = document.getElementById("endDate");
+  const planEndDateInput = document.getElementById("planEndDate");
 
-      const today = new Date();
-      const baseDate = new Date(today);
-      const yyyy = baseDate.getFullYear();
-      const mm = String(baseDate.getMonth() + 1).padStart(2, "0");
-      const dd = String(baseDate.getDate()).padStart(2, "0");
+  const today = new Date();
 
-      startDateInput.value = `${yyyy}-${mm}-${dd}`;
+  // ✅ خليها بكرة
+  const tomorrow = new Date();
+  tomorrow.setDate(today.getDate() + 1);
 
-      const eom = endOfMonthFromDate(baseDate);
-      const eomDD = String(eom.getDate()).padStart(2, "0");
-      const eomStr = `${yyyy}-${mm}-${eomDD}`;
+  const yyyy = tomorrow.getFullYear();
+  const mm = String(tomorrow.getMonth() + 1).padStart(2, "0");
+  const dd = String(tomorrow.getDate()).padStart(2, "0");
 
-      // Set both endDate and planEndDate to End of Month by default
-      endDateInput.value = eomStr;
-      planEndDateInput.value = eomStr;
-    }
+  // start date = tomorrow
+  startDateInput.value = `${yyyy}-${mm}-${dd}`;
+
+  // end of month based on tomorrow
+  const eom = new Date(tomorrow.getFullYear(), tomorrow.getMonth() + 1, 0);
+  const eomStr = formatDateLocal(eom);
+
+  endDateInput.value = eomStr;
+  planEndDateInput.value = eomStr;
+}
 
     function calculateHours() {
       const monthlyTarget = parseFloat(document.getElementById("totalHours").value);
