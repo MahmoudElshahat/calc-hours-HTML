@@ -248,6 +248,21 @@
       font-style: italic;
     }
 
+    tr.old-date td {
+      background: #bbf7d0 !important;
+      color: #14532d;
+    }
+
+    tr.current-date td {
+      background: #fed7aa !important;
+      color: #9a3412;
+      font-weight: 700;
+    }
+
+    tr.current-date td.hours-cell {
+      color: #c2410c;
+    }
+
     td.hours-cell {
       font-weight: 600;
     }
@@ -303,9 +318,27 @@
       transition: transform 0.06s ease, box-shadow 0.06s ease, background 0.06s ease;
     }
 
+    .day-card.old-day-card {
+      background: #dcfce7;
+      border-color: #86efac;
+    }
+
+    .day-card.current-day-card {
+      background: #fed7aa;
+      border-color: #fb923c;
+    }
+
     .day-card:hover {
       background: #f3f4f6;
       box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
+    }
+
+    .day-card.old-day-card:hover {
+      background: #bbf7d0;
+    }
+
+    .day-card.current-day-card:hover {
+      background: #fdba74;
     }
 
     .day-card:active {
@@ -527,13 +560,17 @@
       return `${yyyy}-${mm}-${dd}`;
     }
 
+    function createSafeLocalDate(year, monthIndex, day) {
+      return new Date(year, monthIndex, day, 12, 0, 0, 0);
+    }
+
     function parseDateInputToLocalDate(value) {
       const [y, m, d] = value.split("-").map(Number);
-      return new Date(y, m - 1, d);
+      return createSafeLocalDate(y, m - 1, d);
     }
 
     function endOfMonthFromDate(date) {
-      return new Date(date.getFullYear(), date.getMonth() + 1, 0);
+      return createSafeLocalDate(date.getFullYear(), date.getMonth() + 1, 0);
     }
 
     function updateSecondPeriodVisibility() {
@@ -542,6 +579,16 @@
     }
 
     function refreshDayCardStyle(cardEl, dateStr) {
+      const todayStr = formatDateLocal(new Date());
+
+      cardEl.classList.remove("old-day-card", "current-day-card");
+
+      if (dateStr < todayStr) {
+        cardEl.classList.add("old-day-card");
+      } else if (dateStr === todayStr) {
+        cardEl.classList.add("current-day-card");
+      }
+
       if (offDates.has(dateStr)) {
         cardEl.classList.add("day-off");
       } else {
@@ -570,12 +617,12 @@
       const satOn = document.getElementById("offSaturdayGlobal").checked;
       const friOn = document.getElementById("offFridayGlobal").checked;
       const sunOn = document.getElementById("offSundayGlobal").checked;
-      const last = new Date(year, monthIndex + 1, 0);
+      const last = createSafeLocalDate(year, monthIndex + 1, 0);
 
       // We clear and re-populate based on globals only when this is explicitly needed
       // To keep it simple, we'll assume rebuildCalendarForMonth manages this.
       for (let day = 1; day <= last.getDate(); day++) {
-        const date = new Date(year, monthIndex, day);
+        const date = createSafeLocalDate(year, monthIndex, day);
         const dateStr = formatDateLocal(date);
         const dow = date.getDay();
 
@@ -594,14 +641,14 @@
       const start = parseDateInputToLocalDate(startDateValue);
       const year = start.getFullYear();
       const monthIndex = start.getMonth();
-      const last = new Date(year, monthIndex + 1, 0);
+      const last = createSafeLocalDate(year, monthIndex + 1, 0);
 
       const saturdays = [];
       const sundays = [];
       const fridays = [];
 
       for (let day = 1; day <= last.getDate(); day++) {
-        const date = new Date(year, monthIndex, day);
+        const date = createSafeLocalDate(year, monthIndex, day);
         const ds = formatDateLocal(date);
         const dow = date.getDay();
 
@@ -627,7 +674,7 @@
       const startStr = formatDateLocal(fromDate);
       const endStr = formatDateLocal(toDate);
       
-      const current = new Date(fromDate.getFullYear(), fromDate.getMonth(), fromDate.getDate());
+      const current = createSafeLocalDate(fromDate.getFullYear(), fromDate.getMonth(), fromDate.getDate());
       let count = 0;
       const daysFound = [];
 
@@ -654,7 +701,7 @@
       const meta = document.getElementById("calendarMeta");
       grid.innerHTML = "";
 
-      const last = new Date(year, monthIndex + 1, 0);
+      const last = createSafeLocalDate(year, monthIndex + 1, 0);
       const monthKey = `${year}-${String(monthIndex + 1).padStart(2, "0")}`;
       currentCalendarMonthKey = monthKey;
 
@@ -681,7 +728,7 @@
       weekDays.forEach((d) => datesByDay.set(d.idx, []));
 
       for (let day = 1; day <= last.getDate(); day++) {
-        const date = new Date(year, monthIndex, day);
+        const date = createSafeLocalDate(year, monthIndex, day);
         const dateStr = formatDateLocal(date);
         datesByDay.get(date.getDay()).push({ dateStr });
       }
@@ -769,7 +816,7 @@
   startDateInput.value = `${yyyy}-${mm}-${dd}`;
 
   // end of month based on tomorrow
-  const eom = new Date(tomorrow.getFullYear(), tomorrow.getMonth() + 1, 0);
+  const eom = createSafeLocalDate(tomorrow.getFullYear(), tomorrow.getMonth() + 1, 0);
   const eomStr = formatDateLocal(eom);
 
   endDateInput.value = eomStr;
@@ -798,7 +845,7 @@
       const fixedDailyAfterEnd = parseFloat(document.getElementById("fixedDailyAfterEnd").value);
 
       if (!startDateValue || !endDateValue || !planEndDateValue) {
-        alert("من فضلك اختر تاريخ البداية وتاريخ النهاية وتاريخ نهاية الخطة.");
+        alert("من فضلك اختر تواريخ البداية والنهاية ونهاية الخطة.");
         return;
       }
 
@@ -830,21 +877,25 @@
       }
 
       if (!useSecondPeriod) {
-        mid = new Date(planEnd.getFullYear(), planEnd.getMonth(), planEnd.getDate());
+        mid = createSafeLocalDate(planEnd.getFullYear(), planEnd.getMonth(), planEnd.getDate());
       } else if (mid > planEnd) {
-        mid = new Date(planEnd.getFullYear(), planEnd.getMonth(), planEnd.getDate());
+        mid = createSafeLocalDate(planEnd.getFullYear(), planEnd.getMonth(), planEnd.getDate());
       }
 
       const res1 = countWorkingDaysBySelection(start, mid);
       const workingDays1 = res1.count;
       const daysFound1 = res1.daysFound;
 
+      const startStr = formatDateLocal(start);
+      const midStr = formatDateLocal(mid);
+      const planEndStr = formatDateLocal(planEnd);
+
       let workingDays2 = 0;
       let daysFound2 = [];
       let secondPeriodStart = null;
 
       if (useSecondPeriod && midStr < planEndStr) {
-        secondPeriodStart = new Date(mid.getFullYear(), mid.getMonth(), mid.getDate() + 1);
+        secondPeriodStart = createSafeLocalDate(mid.getFullYear(), mid.getMonth(), mid.getDate() + 1);
         const res2 = countWorkingDaysBySelection(secondPeriodStart, planEnd);
         workingDays2 = res2.count;
         daysFound2 = res2.daysFound;
@@ -863,10 +914,6 @@
 
       const fmt1 = formatHoursMinutes(hoursPerDay1Decimal);
       const fmt2 = formatHoursMinutes(fixedDailyAfterEnd);
-
-      const startStr = formatDateLocal(start);
-      const midStr = formatDateLocal(mid);
-      const planEndStr = formatDateLocal(planEnd);
 
       const workedOffDays = Array.from(offDates).filter(d => {
         const ds = d;
@@ -903,6 +950,7 @@
         <hr style="border: 0; border-top: 1px solid #d1fae5; margin: 15px 0;">
 
         <div style="font-size: 13px;">
+          <div>• إجمالي التواريخ المعروضة في الجدول: <strong>${totalDaysInPeriod}</strong> تاريخ</div>
           <div>• إجمالي الهدف: <strong>${monthlyTarget.toFixed(2)}</strong></div>
           <div>• تم إنجاز: <strong>${workedHours.toFixed(2)}</strong></div>
           <div>• إجمالي الأيام من (${startStr}) إلى (${planEndStr}): <strong>${totalDaysInPeriod}</strong> يوم</div>
@@ -912,9 +960,10 @@
       `;
 
       function countDaysBetween(s, e) {
-        const temp = new Date(s.getFullYear(), s.getMonth(), s.getDate());
+        const temp = createSafeLocalDate(s.getFullYear(), s.getMonth(), s.getDate());
+        const endStr = formatDateLocal(e);
         let c = 0;
-        while (temp <= e) {
+        while (formatDateLocal(temp) <= endStr) {
           c++;
           temp.setDate(temp.getDate() + 1);
         }
@@ -948,18 +997,18 @@
           <tbody>
       `;
 
-      let current = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+      let current = createSafeLocalDate(start.getFullYear(), start.getMonth(), start.getDate());
+      const todayStr = formatDateLocal(new Date());
 
-      while (current.getTime() <= planEnd.getTime()) {
+      while (formatDateLocal(current) <= planEndStr) {
         const ds = formatDateLocal(current);
         const dayName = getDayNameArabic(current.getDay());
         const isOff = offDates.has(ds);
-        const periodLabel = current.getTime() <= mid.getTime() ? "الفترة الأولى" : "الفترة الثانية";
 
         let hoursDecimal = 0;
 
         if (!isOff) {
-          if (current.getTime() <= mid.getTime()) {
+          if (ds <= midStr) {
             hoursDecimal = hoursPerDay1Decimal;
           } else {
             hoursDecimal = useSecondPeriod ? fixedDailyAfterEnd : 0;
@@ -969,8 +1018,21 @@
         let rowClass = "";
         let hoursCell = "0:00";
 
-        if (isOff || (!useSecondPeriod && current.getTime() > mid.getTime())) {
-          rowClass = "off-day";
+        // Determine row class based on date status
+        if (ds < todayStr) {
+          rowClass = "old-date";
+        } else if (ds === todayStr) {
+          rowClass = "current-date";
+        }
+
+        // Determine period: always Period 1 unless second period is enabled and date is after endDate
+        let periodLabel = "الفترة الأولى";
+        if (useSecondPeriod && ds > midStr) {
+          periodLabel = "الفترة الثانية";
+        }
+
+        if (isOff) {
+          rowClass += " off-day";
           hoursCell = "إجازة";
         } else {
           const fmtDay = formatHoursMinutes(hoursDecimal);
@@ -996,6 +1058,7 @@
 
     window.addEventListener("DOMContentLoaded", function () {
       const startDateInput = document.getElementById("startDate");
+      const endDateInput = document.getElementById("endDate");
       const planEndDateInput = document.getElementById("planEndDate");
       const totalHoursInput = document.getElementById("totalHours");
       const workedHoursInput = document.getElementById("workedHours");
@@ -1019,6 +1082,7 @@
       startDateInput.addEventListener("change", () => {
         const start2 = parseDateInputToLocalDate(startDateInput.value);
         const eom2 = endOfMonthFromDate(start2);
+        endDateInput.value = formatDateLocal(eom2);
         planEndDateInput.value = formatDateLocal(eom2);
 
         offDates.clear();
@@ -1027,10 +1091,10 @@
 
       document.getElementById("offSaturdayGlobal").addEventListener("change", (e) => {
         const start3 = parseDateInputToLocalDate(startDateInput.value);
-        const last = new Date(start3.getFullYear(), start3.getMonth() + 1, 0);
+        const last = createSafeLocalDate(start3.getFullYear(), start3.getMonth() + 1, 0);
 
         for (let day = 1; day <= last.getDate(); day++) {
-          const date = new Date(start3.getFullYear(), start3.getMonth(), day);
+          const date = createSafeLocalDate(start3.getFullYear(), start3.getMonth(), day);
           if (date.getDay() === 6) {
             const ds = formatDateLocal(date);
             if (e.target.checked) offDates.add(ds);
@@ -1044,10 +1108,10 @@
 
       document.getElementById("offSundayGlobal").addEventListener("change", (e) => {
         const start3 = parseDateInputToLocalDate(startDateInput.value);
-        const last = new Date(start3.getFullYear(), start3.getMonth() + 1, 0);
+        const last = createSafeLocalDate(start3.getFullYear(), start3.getMonth() + 1, 0);
 
         for (let day = 1; day <= last.getDate(); day++) {
-          const date = new Date(start3.getFullYear(), start3.getMonth(), day);
+          const date = createSafeLocalDate(start3.getFullYear(), start3.getMonth(), day);
           if (date.getDay() === 0) {
             const ds = formatDateLocal(date);
             if (e.target.checked) offDates.add(ds);
@@ -1061,10 +1125,10 @@
 
       document.getElementById("offFridayGlobal").addEventListener("change", (e) => {
         const start3 = parseDateInputToLocalDate(startDateInput.value);
-        const last = new Date(start3.getFullYear(), start3.getMonth() + 1, 0);
+        const last = createSafeLocalDate(start3.getFullYear(), start3.getMonth() + 1, 0);
 
         for (let day = 1; day <= last.getDate(); day++) {
-          const date = new Date(start3.getFullYear(), start3.getMonth(), day);
+          const date = createSafeLocalDate(start3.getFullYear(), start3.getMonth(), day);
           if (date.getDay() === 5) {
             const ds = formatDateLocal(date);
             if (e.target.checked) offDates.add(ds);
